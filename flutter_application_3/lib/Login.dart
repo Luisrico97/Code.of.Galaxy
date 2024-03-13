@@ -1,9 +1,12 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, use_build_context_synchronously, avoid_print
+// ignore_for_file: use_build_context_synchronously, prefer_const_constructors, prefer_const_literals_to_create_immutables
+
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_3/HomePage.dart';
 import 'package:flutter_application_3/RegisterPage.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
@@ -20,6 +23,23 @@ class LoginPage extends StatelessWidget {
       );
 
       if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        final String receivedName = responseData['profile']['name'];
+        final String receivedSurname = responseData['profile']['surname'];
+        final String receivedPhone = responseData['profile']['phone'];
+        final String receivedEmail = responseData['profile']['email'];
+        final String receivedImage = responseData['profile']['image'];
+
+        final Map<String, dynamic> userData = {
+          'name': receivedName,
+          'surname': receivedSurname,
+          'phone': receivedPhone,
+          'email': receivedEmail,
+          'image': receivedImage,
+        }; 
+
+        await _saveUserInfo(userData);
+
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => HomePage(title: 'Galaxy of Code')),
@@ -44,7 +64,6 @@ class LoginPage extends StatelessWidget {
         );
       }
     } catch (e) {
-      print('Error al realizar la solicitud HTTP: $e');
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -63,6 +82,15 @@ class LoginPage extends StatelessWidget {
         },
       );
     }
+  }
+
+  Future<void> _saveUserInfo(Map<String, dynamic> userData) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('name', userData['name'] ?? '');
+    prefs.setString('surname', userData['surname'] ?? '');
+    prefs.setString('phone', userData['phone'] ?? '');
+    prefs.setString('email', userData['email'] ?? '');
+    prefs.setString('image', userData['image'] ?? '');
   }
 
   @override
@@ -118,7 +146,7 @@ class LoginPage extends StatelessWidget {
                 onPressed: () => _login(context),
                 child: Text("Login"),
               ),
-            SizedBox(height: 10), // Espacio entre los botones
+              SizedBox(height: 10), 
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(

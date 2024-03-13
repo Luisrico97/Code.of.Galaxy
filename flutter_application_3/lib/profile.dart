@@ -1,60 +1,70 @@
+// ProfilePage.dart
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
+  @override
+  _ProfilePageState createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  String _name = '';
+  String _surname = '';
+  String _phone = '';
+  String _email = '';
+  String _image = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserInfo();
+  }
+
+  Future<void> _loadUserInfo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _name = prefs.getString('username') ?? '';
+      _surname = prefs.getString('surname') ?? '';
+      _phone = prefs.getString('phone') ?? '';
+      _email = prefs.getString('email') ?? '';
+      _image = prefs.getString('image') ?? '';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: SharedPreferences.getInstance(),
-      builder: (BuildContext context, AsyncSnapshot<SharedPreferences> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          // Mientras se carga SharedPreferences, se puede mostrar un indicador de carga
-          return CircularProgressIndicator();
-        }
-
-        if (!snapshot.hasData) {
-          // Si no se puede obtener SharedPreferences, se puede manejar el error aquí
-          return Text('Error al cargar el perfil');
-        }
-
-        final SharedPreferences prefs = snapshot.data!;
-        final String username = prefs.getString('username') ?? '';
-        final String email = prefs.getString('email') ?? '';
-
-        return Scaffold(
-          appBar: AppBar(
-            title: Text('Profile'),
-          ),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                CircleAvatar(
-                  radius: 50,
-                  backgroundImage: AssetImage('assets/profile_image.jpg'),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Nombre de Usuario: $username',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Correo electrónico: $email',
-                  style: TextStyle(fontSize: 16),
-                ),
-                SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    // Agrega aquí la lógica para editar el perfil
-                  },
-                  child: Text('Editar perfil'),
-                ),
-              ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Profile'),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Name: $_name',
+              style: TextStyle(fontSize: 18.0),
             ),
-          ),
-        );
-      },
+            Text(
+              'Surname: $_surname',
+              style: TextStyle(fontSize: 18.0),
+            ),
+            Text(
+              'Phone: $_phone',
+              style: TextStyle(fontSize: 18.0),
+            ),
+            Text(
+              'Email: $_email',
+              style: TextStyle(fontSize: 18.0),
+            ),
+            // Mostrar la imagen del perfil si se ha almacenado
+            _image.isNotEmpty
+                ? Image.network(_image)
+                : SizedBox(), // Opcionalmente, puedes mostrar una imagen por defecto aquí
+          ],
+        ),
+      ),
     );
   }
 }
