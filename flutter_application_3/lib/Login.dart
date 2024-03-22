@@ -1,14 +1,27 @@
-// ignore_for_file: use_build_context_synchronously, prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: sort_child_properties_last, prefer_const_constructors, use_build_context_synchronously
 
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_3/HomePage.dart';
+import 'package:flutter_application_3/Publications.dart';
 import 'package:flutter_application_3/RegisterPage.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginPage extends StatelessWidget {
+import '../data/bg_data.dart';
+import '../utils/text_utils.dart';
+import '../utils/animations.dart'; // Asegúrate de importar correctamente animations.dart
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -24,6 +37,7 @@ class LoginPage extends StatelessWidget {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
+        final String receivedId = responseData['profile']['id'].toString();
         final String receivedName = responseData['profile']['name'];
         final String receivedSurname = responseData['profile']['surname'];
         final String receivedPhone = responseData['profile']['phone'];
@@ -31,12 +45,13 @@ class LoginPage extends StatelessWidget {
         final String receivedImage = responseData['profile']['image'];
 
         final Map<String, dynamic> userData = {
+          'id': receivedId,
           'name': receivedName,
           'surname': receivedSurname,
           'phone': receivedPhone,
           'email': receivedEmail,
           'image': receivedImage,
-        }; 
+        };
 
         await _saveUserInfo(userData);
 
@@ -85,12 +100,14 @@ class LoginPage extends StatelessWidget {
   }
 
   Future<void> _saveUserInfo(Map<String, dynamic> userData) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('name', userData['name'] ?? '');
-    prefs.setString('surname', userData['surname'] ?? '');
-    prefs.setString('phone', userData['phone'] ?? '');
-    prefs.setString('email', userData['email'] ?? '');
-    prefs.setString('image', userData['image'] ?? '');
+    await SharedPreferences.getInstance().then((prefs) {
+      prefs.setString('name', userData['name'] ?? '');
+      prefs.setString('surname', userData['surname'] ?? '');
+      prefs.setString('phone', userData['phone'] ?? '');
+      prefs.setString('email', userData['email'] ?? '');
+      prefs.setString('image', userData['image'] ?? '');
+      prefs.setInt('id', int.parse(userData['id']) ?? -1);
+    });
   }
 
   @override
@@ -101,62 +118,115 @@ class LoginPage extends StatelessWidget {
         backgroundColor: const Color.fromARGB(0, 76, 175, 79),
         centerTitle: true,
       ),
-      body: Center(
-        child: Container(
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color.fromARGB(255, 0, 0, 0),
-                Color.fromARGB(255, 81, 18, 163),
-                Color.fromARGB(255, 214, 214, 214),
-              ],
-            ),
+      body: Container(
+        height: double.infinity,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(bgList[0]), // Ajusta el índice según tu lógica
+            fit: BoxFit.fill,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset('assets/Logo.png', height: 150),
-              SizedBox(height: 15),
-              TextField(
-                controller: _usernameController,
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  labelText: 'Username',
-                  labelStyle: TextStyle(color: Colors.white),
-                  icon: Icon(Icons.person, color: Colors.white),
+        ),
+        alignment: Alignment.center,
+        child: Container(
+          height: 400,
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(horizontal: 30),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.white),
+            borderRadius: BorderRadius.circular(15),
+            color: Colors.black.withOpacity(0.1),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaY: 5, sigmaX: 5),
+              child: Padding(
+                padding: const EdgeInsets.all(25),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Spacer(),
+                    Center(child: TextUtil(text: "Login", weight: true, size: 30)),
+                    Spacer(),
+                    TextUtil(text: "Email"),
+                    Container(
+                      height: 35,
+                      decoration: BoxDecoration(
+                        border: Border(bottom: BorderSide(color: Colors.white)),
+                      ),
+                      child: TextFormField(
+                        controller: _usernameController,
+                        style: TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          suffixIcon: Icon(Icons.mail, color: Colors.white),
+                          fillColor: Colors.white,
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                    Spacer(),
+                    TextUtil(text: "Password"),
+                    Container(
+                      height: 35,
+                      decoration: BoxDecoration(
+                        border: Border(bottom: BorderSide(color: Colors.white)),
+                      ),
+                      child: TextFormField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        style: TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          suffixIcon: Icon(Icons.lock, color: Colors.white),
+                          fillColor: Colors.white,
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                    Spacer(),
+                    ElevatedButton(
+                      onPressed: () => _login(context),
+                      child: TextUtil(text: "Log In", color: Colors.black),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                        shape: MaterialStateProperty.all<OutlinedBorder>(
+                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                        ),
+                      ),
+                    ),
+                    Spacer(), 
+                    ElevatedButton(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => RegisterPage()),
+                      ),
+                      child: TextUtil(text: "Sig up", color: Colors.black),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                        shape: MaterialStateProperty.all<OutlinedBorder>(
+                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                        ),
+                      ),
+                    ),
+                    Spacer(),
+                    ElevatedButton(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Publications()),
+                      ),
+                      child: TextUtil(text: "Visitante", color: Colors.black),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                        shape: MaterialStateProperty.all<OutlinedBorder>(
+                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                        ),
+                      ),
+                    ),           
+                    Spacer(),
+                  ],
                 ),
               ),
-              SizedBox(height: 16.0),
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  labelStyle: TextStyle(color: Colors.white),
-                  icon: Icon(Icons.lock, color: Colors.white),
-                ),
-              ),
-              SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: () => _login(context),
-                child: Text("Login"),
-              ),
-              SizedBox(height: 10), 
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RegisterPage()),
-                  );
-                },
-                child: Text("Register"),
-              ),
-            ],
+            ),
           ),
         ),
       ),

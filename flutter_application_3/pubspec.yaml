@@ -60,6 +60,19 @@ flutter:
   assets:
     - assets/Logo.png
     - assets/Group.jpg
+    - assets/placeholder.png
+    - assets/bg1.jpeg
+    - assets/bg2.jpeg
+    - assets/bg3.jpeg
+    - assets/bg4.webp
+    - assets/bg5.jpeg
+    - assets/bg6.jpeg
+    - assets/bg7.jpg
+    - assets/bg8.jpeg
+    - assets/cover.jpeg
+    - assets/placeholder.png
+
+
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

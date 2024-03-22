@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_application_3/menu.dart';
@@ -29,11 +31,13 @@ class Comment {
   final int id;
   final String comment;
   final String date;
+  final String username; // Agrega el nombre del usuario
 
   Comment({
     required this.id,
     required this.comment,
     required this.date,
+    required this.username, // Actualiza el constructor para incluir el nombre del usuario
   });
 
   factory Comment.fromJson(Map<String, dynamic> json) {
@@ -41,6 +45,7 @@ class Comment {
       id: json['id'],
       comment: json['comment'] ?? '',
       date: json['date'] ?? '',
+      username: json['username'] ?? '', // Asigna el valor del nombre del usuario
     );
   }
 }
@@ -71,6 +76,7 @@ class _PublicationsState extends State<Publications> {
   late Future<List<Publication>> futurePublications;
   TextEditingController searchController = TextEditingController();
   TextEditingController publicationController = TextEditingController();
+  bool isVisitor = true; // Variable para indicar si el usuario es un visitante o no
 
   @override
   void initState() {
@@ -122,25 +128,27 @@ class _PublicationsState extends State<Publications> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: TextField(
-          controller: searchController,
-          onChanged: (value) {
-            setState(() {}); // Update the UI when text changes
-          },
-          decoration: InputDecoration(
-            hintText: 'Search publications...',
-            border: InputBorder.none,
-          ),
+ @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: TextField(
+        controller: searchController,
+        onChanged: (value) {
+          setState(() {}); // Actualiza la interfaz cuando cambia el texto
+        },
+        decoration: InputDecoration(
+          hintText: 'Search publications...',
+          border: InputBorder.none,
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {},
-          ),
+      ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.search),
+          onPressed: () {},
+        ),
+        // Condición para mostrar u ocultar el botón de agregar publicación
+        if (!isVisitor)
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
@@ -171,99 +179,103 @@ class _PublicationsState extends State<Publications> {
               );
             },
           ),
-        ],
-      ),
-      drawer: Drawer(
-        child: DrawerScreen(),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: FutureBuilder<List<Publication>>(
-              future: futurePublications,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final filteredList = filteredPublications(snapshot.data!, searchController.text);
-                  return ListView.builder(
-                    itemCount: filteredList.length,
-                    itemBuilder: (context, index) {
-                      final publication = filteredList[index];
-                      return Column(
+      ],
+    ),
+    drawer: Drawer(
+      child: DrawerScreen(),
+    ),
+    body: FutureBuilder<List<Publication>>(
+      future: futurePublications,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final filteredList = filteredPublications(snapshot.data!, searchController.text);
+          return SizedBox(
+            height: MediaQuery.of(context).size.height * 0.8, // Limita al 80% del alto de la pantalla
+            child: ListView.builder(
+              itemCount: filteredList.length,
+              itemBuilder: (context, index) {
+                final publication = filteredList[index];
+                return Column(
+                  children: [
+                    ListTile(
+                      title: Text('Publication: ${publication.publication}'),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          ListTile(
-                            title: Text('Publication: ${publication.publication}'),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Date: ${publication.date}'),
-                              ],
-                            ),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => IndividualPublicationPage(publicationId: publication.id),
-                                ),
-                              );
-                            },
-                          ),
-                          ElevatedButton( // Botón para desplegar comentarios
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: Text('Comments'),
-                                  content: FutureBuilder<List<Comment>>(
-                                    future: fetchComments(publication.id),
-                                    builder: (context, commentSnapshot) {
-                                      if (commentSnapshot.connectionState == ConnectionState.waiting) {
-                                        return Center(child: CircularProgressIndicator());
-                                      } else if (commentSnapshot.hasError) {
-                                        return Center(child: Text('Error loading comments'));
-                                      } else {
-                                        return Column(
-                                          children: commentSnapshot.data!.map((comment) {
-                                            return ListTile(
-                                              title: Text('aqui pondre el nombre de la persona que comento: ${comment.id}'),
-                                              subtitle: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text('Comment: ${comment.comment}'),
-                                                  Text('Date: ${comment.date}'),
-                                                ],
-                                              ),
-                                            );
-                                          }).toList(),
-                                        );
-                                      }
-                                    },
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text('Close'),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                            child: Text('View Comments'),
-                          ),
+                          Text('Date: ${publication.date}'),
                         ],
-                      );
-                    },
-                  );
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('${snapshot.error}'));
-                }
-                return Center(child: CircularProgressIndicator());
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => IndividualPublicationPage(publicationId: publication.id),
+                          ),
+                        );
+                      },
+                    ),
+                    ElevatedButton( // Botón para desplegar comentarios
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text('Comments'),
+                            content: SingleChildScrollView(
+                              child: SizedBox(
+                                width: double.maxFinite,
+                                child: FutureBuilder<List<Comment>>(
+                                  future: fetchComments(publication.id),
+                                  builder: (context, commentSnapshot) {
+                                    if (commentSnapshot.connectionState == ConnectionState.waiting) {
+                                      return Center(child: CircularProgressIndicator());
+                                    } else if (commentSnapshot.hasError) {
+                                      return Center(child: Text('Error loading comments'));
+                                    } else {
+                                      return Column(
+                                        children: commentSnapshot.data!.map((comment) {
+                                          return ListTile(
+                                            title: Text('User: ${comment.username}'),
+                                            subtitle: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text('Comment: ${comment.comment}'),
+                                                Text('Date: ${comment.date}'),
+                                              ],
+                                            ),
+                                          );
+                                        }).toList(),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text('Close'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      child: Text('View Comments'),
+                    ),
+                  ],
+                );
               },
             ),
-          ),
-        ],
-      ),
-    );
-  }
+          );
+        } else if (snapshot.hasError) {
+          return Center(child: Text('${snapshot.error}'));
+        }
+        return Center(child: CircularProgressIndicator());
+      },
+    ),
+  );
+}
+
+
 }

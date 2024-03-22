@@ -1,8 +1,8 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_3/Login.dart';
-import 'package:flutter_application_3/profile.dart'; // Importa el archivo profile.dart
+import 'package:flutter_application_3/profile.dart';
+import 'package:flutter_application_3/mypost.dart'; // Importa la pantalla MyPost
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DrawerScreen extends StatefulWidget {
   @override
@@ -10,6 +10,23 @@ class DrawerScreen extends StatefulWidget {
 }
 
 class _DrawerScreenState extends State<DrawerScreen> {
+  String _userName = '';
+  String _userSurname = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserInfo();
+  }
+
+  Future<void> _loadUserInfo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _userName = prefs.getString('name') ?? '';
+      _userSurname = prefs.getString('surname') ?? '';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,22 +51,35 @@ class _DrawerScreenState extends State<DrawerScreen> {
                   SizedBox(
                     width: 10,
                   ),
-                  Text(
-                    'Mosallas Group',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _userName,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        _userSurname,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
               Column(
                 children: <Widget>[
-                  GestureDetector( // Agrega GestureDetector para envolver el NewRow de Profile
+                  GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => ProfilePage()), // Navega a ProfilePage al hacer clic en Profile
+                        MaterialPageRoute(builder: (context) => ProfilePage()),
                       );
                     },
                     child: NewRow(
@@ -60,9 +90,17 @@ class _DrawerScreenState extends State<DrawerScreen> {
                   SizedBox(
                     height: 20,
                   ),
-                  NewRow(
-                    text: 'Settings',
-                    icon: Icons.error_outline,
+                  GestureDetector( // Agregar GestureDetector para My Post
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => MyPost()), // Navegar a MyPost
+                      );
+                    },
+                    child: NewRow(
+                      text: 'My Post',
+                      icon: Icons.error_outline,
+                    ),
                   ),
                   SizedBox(
                     height: 20,
