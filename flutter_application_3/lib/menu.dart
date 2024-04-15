@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_3/Login.dart';
-import 'package:flutter_application_3/profile.dart';
-import 'package:flutter_application_3/mypost.dart'; // Importa la pantalla MyPost
+import 'package:galaxy/Login.dart';
+import 'package:galaxy/profile.dart';
+import 'package:galaxy/mypost.dart'; // Importa la pantalla MyPost
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DrawerScreen extends StatefulWidget {

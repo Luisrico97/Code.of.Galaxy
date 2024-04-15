@@ -4,15 +4,15 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_application_3/HomePage.dart';
-import 'package:flutter_application_3/Publications.dart';
-import 'package:flutter_application_3/RegisterPage.dart';
+import 'package:galaxy/HomePage.dart';
+import 'package:galaxy/Publications.dart';
+import 'package:galaxy/RegisterPage.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/bg_data.dart';
 import '../utils/text_utils.dart';
-import '../utils/animations.dart'; // Asegúrate de importar correctamente animations.dart
+// Asegúrate de importar correctamente animations.dart
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -25,41 +25,34 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  Future<void> _login(BuildContext context) async {
-    final String username = _usernameController.text.trim();
-    final String password = _passwordController.text.trim();
+Future<void> _login(BuildContext context) async {
+  final String username = _usernameController.text.trim();
+  final String password = _passwordController.text.trim();
 
-    try {
-      final response = await http.post(
-        Uri.parse('http://localhost:8000/api/login'),
-        body: {'email': username, 'password': password},
-      );
+  try {
+    final response = await http.post(
+      Uri.parse('http://localhost:8000/api/login'),
+      body: {'email': username, 'password': password},
+    );
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(response.body);
-        final String receivedId = responseData['profile']['id'].toString();
-        final String receivedName = responseData['profile']['name'];
-        final String receivedSurname = responseData['profile']['surname'];
-        final String receivedPhone = responseData['profile']['phone'];
-        final String receivedEmail = responseData['profile']['email'];
-        final String receivedImage = responseData['profile']['image'];
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
 
-        final Map<String, dynamic> userData = {
-          'id': receivedId,
-          'name': receivedName,
-          'surname': receivedSurname,
-          'phone': receivedPhone,
-          'email': receivedEmail,
-          'image': receivedImage,
-        };
+      // Verificar si el mensaje es "success"
+      if (responseData['message'] == 'success') {
+        // Extraer los datos del perfil del usuario
+        final Map<String, dynamic> profileData = responseData['profile'];
 
-        await _saveUserInfo(userData);
+        // Guardar la información del usuario en SharedPreferences
+        await _saveUserInfo(profileData);
 
+        // Redirigir a la página de inicio
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => HomePage(title: 'Galaxy of Code')),
         );
       } else {
+        // Mostrar un mensaje de error si el inicio de sesión falla
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -78,13 +71,14 @@ class _LoginPageState extends State<LoginPage> {
           },
         );
       }
-    } catch (e) {
+    } else {
+      // Mostrar un mensaje de error si la solicitud no es exitosa
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('Error de conexión'),
-            content: Text('El usuario o contraseña son incorrectos.'),
+            content: Text('Hubo un problema al conectar con el servidor.'),
             actions: <Widget>[
               TextButton(
                 child: Text('OK'),
@@ -97,7 +91,30 @@ class _LoginPageState extends State<LoginPage> {
         },
       );
     }
+  } catch (e) {
+    // Mostrar un mensaje de error si ocurre una excepción
+    print('Error: $e'); // Imprime el error para depurar
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text('Hubo un problema al procesar la solicitud. Detalles: $e'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
+}
+
+
 
   Future<void> _saveUserInfo(Map<String, dynamic> userData) async {
     await SharedPreferences.getInstance().then((prefs) {
@@ -106,8 +123,8 @@ class _LoginPageState extends State<LoginPage> {
       prefs.setString('phone', userData['phone'] ?? '');
       prefs.setString('email', userData['email'] ?? '');
       prefs.setString('image', userData['image'] ?? '');
-      prefs.setInt('id', int.parse(userData['id']) ?? -1);
-    });
+      prefs.setInt('id', userData['id'] ?? -1);
+});
   }
 
   @override

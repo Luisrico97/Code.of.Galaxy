@@ -3,11 +3,11 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:flutter_application_3/Framework.dart';
-import 'package:flutter_application_3/Publications.dart';
-import 'package:flutter_application_3/User.dart';
-import 'package:flutter_application_3/language.dart';
-import 'package:flutter_application_3/menu.dart';
+import 'package:galaxy/Framework.dart';
+import 'package:galaxy/Publications.dart';
+import 'package:galaxy/User.dart';
+import 'package:galaxy/language.dart';
+import 'package:galaxy/menu.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -56,7 +56,7 @@ class _HomePageState extends State<HomePage> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Language()),
+                  MaterialPageRoute(builder: (context) => Languages()),
                 );
               },
               color: const Color.fromARGB(255, 60, 60, 60),
@@ -66,7 +66,7 @@ class _HomePageState extends State<HomePage> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Framework()),
+                  MaterialPageRoute(builder: (context) => Frameworks()),
                 );
               },
               color: const Color.fromARGB(255, 60, 60, 60),
@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => User()),
+                  MaterialPageRoute(builder: (context) => Users()),
                 );
               },
               color: const Color.fromARGB(255, 60, 60, 60),

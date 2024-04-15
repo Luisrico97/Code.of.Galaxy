@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 
-class User extends StatelessWidget {
-  const User({Key? key}) : super(key: key);
+class Users extends StatelessWidget {
+  const Users({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_3/Publications.dart';
+import 'package:galaxy/Publications.dart';
 import 'package:http/http.dart' as http;
 
 class RegisterPage extends StatefulWidget {
