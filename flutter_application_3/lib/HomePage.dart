@@ -9,7 +9,6 @@ import 'package:galaxy/User.dart';
 import 'package:galaxy/language.dart';
 import 'package:galaxy/menu.dart';
 
-
 class HomePage extends StatefulWidget {
   const HomePage({
     Key? key,
@@ -17,7 +16,7 @@ class HomePage extends StatefulWidget {
   }) : super(key: key);
 
   final String title;
-  
+
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -35,7 +34,7 @@ class _HomePageState extends State<HomePage> {
       drawer: Drawer(
         child: DrawerScreen(),
       ),
-      backgroundColor: Color.fromARGB(255, 51, 51, 51), 
+      backgroundColor: Color.fromARGB(255, 51, 51, 51),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

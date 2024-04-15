@@ -90,11 +90,13 @@ class _DrawerScreenState extends State<DrawerScreen> {
                   SizedBox(
                     height: 20,
                   ),
-                  GestureDetector( // Agregar GestureDetector para My Post
+                  GestureDetector(
+                    // Agregar GestureDetector para My Post
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => MyPost()), // Navegar a MyPost
+                        MaterialPageRoute(
+                            builder: (context) => MyPost()), // Navegar a MyPost
                       );
                     },
                     child: NewRow(

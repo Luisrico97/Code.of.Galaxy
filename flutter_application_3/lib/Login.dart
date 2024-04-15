@@ -12,7 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/bg_data.dart';
 import '../utils/text_utils.dart';
-// Asegúrate de importar correctamente animations.dart
+// Asegúrate de importar correctamente ani      mations.dart
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -25,40 +25,61 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-Future<void> _login(BuildContext context) async {
-  final String username = _usernameController.text.trim();
-  final String password = _passwordController.text.trim();
+  Future<void> _login(BuildContext context) async {
+    final String username = _usernameController.text.trim();
+    final String password = _passwordController.text.trim();
 
-  try {
-    final response = await http.post(
-      Uri.parse('http://localhost:8000/api/login'),
-      body: {'email': username, 'password': password},
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost:8000/api/login'),
+        body: {'email': username, 'password': password},
+      );
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> responseData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
 
-      // Verificar si el mensaje es "success"
-      if (responseData['message'] == 'success') {
-        // Extraer los datos del perfil del usuario
-        final Map<String, dynamic> profileData = responseData['profile'];
+        // Verificar si el mensaje es "success"
+        if (responseData['message'] == 'success') {
+          // Extraer los datos del perfil del usuario
+          final Map<String, dynamic> profileData = responseData['profile'];
 
-        // Guardar la información del usuario en SharedPreferences
-        await _saveUserInfo(profileData);
+          // Guardar la información del usuario en SharedPreferences
+          await _saveUserInfo(profileData);
 
-        // Redirigir a la página de inicio
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage(title: 'Galaxy of Code')),
-        );
+          // Redirigir a la página de inicio
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => HomePage(title: 'Galaxy of Code')),
+          );
+        } else {
+          // Mostrar un mensaje de error si el inicio de sesión falla
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Error de inicio de sesión'),
+                content: Text('Las credenciales ingresadas son incorrectas.'),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        }
       } else {
-        // Mostrar un mensaje de error si el inicio de sesión falla
+        // Mostrar un mensaje de error si la solicitud no es exitosa
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Error de inicio de sesión'),
-              content: Text('Las credenciales ingresadas son incorrectas.'),
+              title: Text('Error de conexión'),
+              content: Text('Hubo un problema al conectar con el servidor.'),
               actions: <Widget>[
                 TextButton(
                   child: Text('OK'),
@@ -71,14 +92,16 @@ Future<void> _login(BuildContext context) async {
           },
         );
       }
-    } else {
-      // Mostrar un mensaje de error si la solicitud no es exitosa
+    } catch (e) {
+      // Mostrar un mensaje de error si ocurre una excepción
+      print('Error: $e'); // Imprime el error para depurar
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Error de conexión'),
-            content: Text('Hubo un problema al conectar con el servidor.'),
+            title: Text('Error'),
+            content:
+                Text('Hubo un problema al procesar la solicitud. Detalles: $e'),
             actions: <Widget>[
               TextButton(
                 child: Text('OK'),
@@ -91,30 +114,7 @@ Future<void> _login(BuildContext context) async {
         },
       );
     }
-  } catch (e) {
-    // Mostrar un mensaje de error si ocurre una excepción
-    print('Error: $e'); // Imprime el error para depurar
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Error'),
-          content: Text('Hubo un problema al procesar la solicitud. Detalles: $e'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
-}
-
-
 
   Future<void> _saveUserInfo(Map<String, dynamic> userData) async {
     await SharedPreferences.getInstance().then((prefs) {
@@ -124,7 +124,7 @@ Future<void> _login(BuildContext context) async {
       prefs.setString('email', userData['email'] ?? '');
       prefs.setString('image', userData['image'] ?? '');
       prefs.setInt('id', userData['id'] ?? -1);
-});
+    });
   }
 
   @override
@@ -164,7 +164,8 @@ Future<void> _login(BuildContext context) async {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Spacer(),
-                    Center(child: TextUtil(text: "Login", weight: true, size: 30)),
+                    Center(
+                        child: TextUtil(text: "Login", weight: true, size: 30)),
                     Spacer(),
                     TextUtil(text: "Email"),
                     Container(
@@ -205,13 +206,15 @@ Future<void> _login(BuildContext context) async {
                       onPressed: () => _login(context),
                       child: TextUtil(text: "Log In", color: Colors.black),
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white),
                         shape: MaterialStateProperty.all<OutlinedBorder>(
-                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30)),
                         ),
                       ),
                     ),
-                    Spacer(), 
+                    Spacer(),
                     ElevatedButton(
                       onPressed: () => Navigator.push(
                         context,
@@ -219,9 +222,11 @@ Future<void> _login(BuildContext context) async {
                       ),
                       child: TextUtil(text: "Sig up", color: Colors.black),
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white),
                         shape: MaterialStateProperty.all<OutlinedBorder>(
-                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30)),
                         ),
                       ),
                     ),
@@ -233,12 +238,14 @@ Future<void> _login(BuildContext context) async {
                       ),
                       child: TextUtil(text: "Visitante", color: Colors.black),
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white),
                         shape: MaterialStateProperty.all<OutlinedBorder>(
-                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30)),
                         ),
                       ),
-                    ),           
+                    ),
                     Spacer(),
                   ],
                 ),
