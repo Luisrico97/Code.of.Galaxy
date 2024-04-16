@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/services.dart'; // Asegúrate de importar esto
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,6 +18,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String _email = '';
   String _image = '';
   int id = -1;
+  String _accessToken = ''; // Paso 1: Añadir variable de instancia
 
   bool _isEditing = false;
 
@@ -29,6 +31,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _loadUserInfo();
+    _loadAccessToken(); // Llamada al método para cargar el token de acceso
   }
 
   Future<void> _loadUserInfo() async {
@@ -36,7 +39,7 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       _name = prefs.getString('name') ?? '';
       _surname = prefs.getString('surname') ?? '';
-      _phone = prefs.getString('phone') ?? '';
+      _phone = (prefs.getInt('phone') ?? 0).toString();
       _email = prefs.getString('email') ?? '';
       _image = prefs.getString('image') ?? '';
       id = prefs.getInt('id') ?? -1;
@@ -49,7 +52,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _fetchUserInfo(int id) async {
     try {
-      var response = await http.get(Uri.parse('https://rico.terrabyteco.com/api/users/item/$id'));
+      var response = await http
+          .get(Uri.parse('https://rico.terrabyteco.com/api/users/item/$id'));
       if (response.statusCode == 200) {
         var userData = json.decode(response.body);
         setState(() {
@@ -70,7 +74,8 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _updateUserInfo() async {
     String newName = _nameController.text;
     String newSurname = _surnameController.text;
-    String newPhone = _phoneController.text;
+    // Convertir el número de teléfono a int
+    int newPhone = int.tryParse(_phoneController.text) ?? 0;
     String newEmail = _emailController.text;
 
     var response = await http.post(
@@ -78,7 +83,7 @@ class _ProfilePageState extends State<ProfilePage> {
       body: {
         'name': newName,
         'surname': newSurname,
-        'phone': newPhone,
+        'phone': newPhone.toString(), // Convertir a String antes de enviar
         'email': newEmail,
         'image': _image,
       },
@@ -90,19 +95,27 @@ class _ProfilePageState extends State<ProfilePage> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('name', newName);
       await prefs.setString('surname', newSurname);
-      await prefs.setString('phone', newPhone);
+      await prefs.setInt(
+          'phone', newPhone); // Guardar como int en SharedPreferences
       await prefs.setString('email', newEmail);
       // Actualizar los datos en el estado local
       setState(() {
         _name = newName;
         _surname = newSurname;
-        _phone = newPhone;
+        _phone = newPhone.toString(); // Actualizar _phone como String
         _email = newEmail;
         _isEditing = false;
       });
     } else {
       print('Error al actualizar el usuario');
     }
+  }
+
+  Future<void> _loadAccessToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _accessToken = prefs.getString('access_token') ?? '';
+    });
   }
 
   Future<void> _updateProfileImage() async {
@@ -155,7 +168,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     'Name: $_name',
                     style: TextStyle(fontSize: 18.0),
                   ),
-
             _isEditing
                 ? TextFormField(
                     controller: _surnameController,
@@ -165,17 +177,19 @@ class _ProfilePageState extends State<ProfilePage> {
                     'Surname: $_surname',
                     style: TextStyle(fontSize: 18.0),
                   ),
-
             _isEditing
-                ? TextFormField(
+                ? TextField(
                     controller: _phoneController,
+                    keyboardType: TextInputType.number,
                     decoration: InputDecoration(labelText: 'Phone'),
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
                   )
                 : Text(
                     'Phone: $_phone',
                     style: TextStyle(fontSize: 18.0),
                   ),
-
             _isEditing
                 ? TextFormField(
                     controller: _emailController,
@@ -207,7 +221,6 @@ class _ProfilePageState extends State<ProfilePage> {
               },
               child: Text(_isEditing ? 'Cancelar' : 'Editar'),
             ),
-
             if (_isEditing)
               ElevatedButton(
                 onPressed: () {
@@ -215,16 +228,16 @@ class _ProfilePageState extends State<ProfilePage> {
                 },
                 child: Text('Guardar Cambios'),
               ),
-
-            /*ElevatedButton(
-              onPressed: () {
-                _updateProfileImage();
-              },
-              child: Text('Actualizar Imagen'),
-            ),*/
-          ],
-        ),
-      ),
-    );
+            Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: Text(
+                'Access Token: $_accessToken',
+                style: TextStyle(fontSize: 18.0),
+              ),
+            ),
+          ], // Cierre del children
+        ), // Cierre del Column
+      ), // Cierre del Padding
+    ); // Cierre del Scaffold
   }
 }

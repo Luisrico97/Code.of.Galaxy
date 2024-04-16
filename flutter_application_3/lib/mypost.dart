@@ -23,13 +23,17 @@ class _MyPostState extends State<MyPost> {
     setState(() {
       userId = prefs.getInt('id') ?? -1;
     });
+
+    // Imprimir el ID del usuario en la consola
+    print('ID del usuario: $userId');
+
     fetchUserPublications(
         userId); // Llamar a la función para cargar las publicaciones del usuario
   }
 
   Future<void> fetchUserPublications(int userId) async {
-    final response = await http
-        .get(Uri.parse('https://rico.terrabyteco.com//api/publications/user/$userId'));
+    final response = await http.get(Uri.parse(
+        'https://rico.terrabyteco.com/api/publications/user/$userId'));
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       setState(() {
@@ -37,6 +41,33 @@ class _MyPostState extends State<MyPost> {
       });
     } else {
       throw Exception('Failed to load user publications');
+    }
+  }
+
+  Future<void> _deletePublication(int publicationId) async {
+    final response = await http.delete(
+      Uri.parse(
+          'https://rico.terrabyteco.com/api/publications/delete/$publicationId'),
+    );
+    if (response.statusCode == 200) {
+      // Eliminar la publicación de la lista
+      setState(() {
+        publications!
+            .removeWhere((publication) => publication['id'] == publicationId);
+      });
+      // Mostrar un mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Publicación eliminada con éxito'),
+        ),
+      );
+    } else {
+      // Mostrar un mensaje de error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al eliminar la publicación'),
+        ),
+      );
     }
   }
 
@@ -56,11 +87,17 @@ class _MyPostState extends State<MyPost> {
                     publication['publication'] ?? 'No title available';
                 final publicationDate =
                     publication['created'] ?? 'No date available';
+                final publicationId = publication['id'];
                 return Card(
                   child: ListTile(
                     title: Text(publicationTitle.toString()),
                     subtitle: Text(publicationDate.toString()),
-                    // Puedes agregar más información de las publicaciones aquí
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () {
+                        _deletePublication(publicationId);
+                      },
+                    ),
                   ),
                 );
               },

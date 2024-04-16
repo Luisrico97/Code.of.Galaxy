@@ -245,8 +245,10 @@ class _PublicationsState extends State<Publications> {
   }
 
   Future<List<Publication>> fetchPublications() async {
-    final response =
-        await http.get(Uri.parse('https://rico.terrabyteco.com/api/publications'));
+    final url = 'https://rico.terrabyteco.com/api/publications';
+    print('Fetching publications from: $url'); // Imprime la URL del endpoint
+
+    final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body) as List<dynamic>;
       final publications = <Publication>[];
@@ -257,8 +259,12 @@ class _PublicationsState extends State<Publications> {
         publications.add(publication);
       }
 
+      print(
+          'Publications data received: $publications'); // Imprime los datos de las publicaciones recibidos
+
       return publications;
     } else {
+      print('Failed to fetch publications: ${response.statusCode}');
       throw Exception('Failed to load publications');
     }
   }
@@ -331,8 +337,8 @@ class _PublicationsState extends State<Publications> {
 
   // Función para cargar los nombres de los frameworks desde la API
   Future<void> fetchFrameworkNames() async {
-    final response =
-        await http.get(Uri.parse('https://rico.terrabyteco.com/api/frameworks'));
+    final response = await http
+        .get(Uri.parse('https://rico.terrabyteco.com/api/frameworks'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body) as List<dynamic>;
       setState(() {
@@ -360,13 +366,20 @@ class _PublicationsState extends State<Publications> {
   }
 
   Future<String> fetchUserName(int userId) async {
-    final response =
-        await http.get(Uri.parse('https://rico.terrabyteco.com/api/users/$userId'));
+    final url = 'https://rico.terrabyteco.com/api/users/$userId';
+    print('Fetching user data from: $url'); // Imprime la URL del endpoint
+
+    final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body) as Map<String, dynamic>;
       final user = User.fromJson(jsonData);
+
+      print(
+          'User data received: $user'); // Imprime los datos del usuario recibidos
+
       return '${user.name} ${user.surname}';
     } else {
+      print('Failed to fetch user data: ${response.statusCode}');
       throw Exception('Failed to load user');
     }
   }

@@ -42,9 +42,10 @@ class _LoginPageState extends State<LoginPage> {
         if (responseData['message'] == 'success') {
           // Extraer los datos del perfil del usuario
           final Map<String, dynamic> profileData = responseData['profile'];
+          final String accessToken = responseData['access_token'];
 
-          // Guardar la información del usuario en SharedPreferences
-          await _saveUserInfo(profileData);
+          // Guardar la información del usuario y el token de acceso en SharedPreferences
+          await _saveUserInfo(profileData, accessToken);
 
           // Redirigir a la página de inicio
           Navigator.push(
@@ -116,14 +117,19 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<void> _saveUserInfo(Map<String, dynamic> userData) async {
+  Future<void> _saveUserInfo(
+      Map<String, dynamic> userData, String accessToken) async {
     await SharedPreferences.getInstance().then((prefs) {
       prefs.setString('name', userData['name'] ?? '');
       prefs.setString('surname', userData['surname'] ?? '');
-      prefs.setString('phone', userData['phone'] ?? '');
+      prefs.setInt(
+          'phone',
+          userData['phone'] ??
+              0); // Asegúrate de establecer un valor predeterminado para el tipo int
       prefs.setString('email', userData['email'] ?? '');
       prefs.setString('image', userData['image'] ?? '');
       prefs.setInt('id', userData['id'] ?? -1);
+      prefs.setString('access_token', accessToken);
     });
   }
 

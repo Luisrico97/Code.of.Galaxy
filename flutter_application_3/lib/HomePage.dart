@@ -71,30 +71,6 @@ class _HomePageState extends State<HomePage> {
               color: const Color.fromARGB(255, 60, 60, 60),
               text: 'Framework',
             ),
-            _buildCustomInkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Users()),
-                );
-              },
-              color: const Color.fromARGB(255, 60, 60, 60),
-              text: 'Users',
-            ),
-            _buildCustomInkWell(
-              onTap: () {
-                // Add your action for 'Comment' here
-              },
-              color: const Color.fromARGB(255, 60, 60, 60),
-              text: 'Comment',
-            ),
-            _buildCustomInkWell(
-              onTap: () {
-                // Add your action for 'Votes' here
-              },
-              color: const Color.fromARGB(255, 60, 60, 60),
-              text: 'Votes',
-            ),
           ],
         ),
       ),

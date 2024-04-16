@@ -17,7 +17,8 @@ class _RegisterPageState extends State<RegisterPage> {
   Future<void> _register() async {
     final String name = _nameController.text.trim();
     final String surname = _surnameController.text.trim();
-    final String phone = _phoneController.text.trim();
+    final int phone =
+        int.tryParse(_phoneController.text.trim()) ?? 0; // Convertir a int
     final String email = _emailController.text.trim();
     final String password = _passwordController.text.trim();
 
@@ -28,7 +29,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     request.fields['name'] = name;
     request.fields['surname'] = surname;
-    request.fields['phone'] = phone;
+    request.fields['phone'] = phone.toString(); // Convertir de nuevo a String
     request.fields['email'] = email;
     request.fields['password'] = password;
 
