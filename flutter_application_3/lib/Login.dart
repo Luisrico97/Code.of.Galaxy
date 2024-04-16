@@ -31,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://localhost:8000/api/login'),
+        Uri.parse('https://rico.terrabyteco.com/api/login'),
         body: {'email': username, 'password': password},
       );
 

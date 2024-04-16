@@ -49,7 +49,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _fetchUserInfo(int id) async {
     try {
-      var response = await http.get(Uri.parse('http://localhost:8000/api/users/item/$id'));
+      var response = await http.get(Uri.parse('https://rico.terrabyteco.com/api/users/item/$id'));
       if (response.statusCode == 200) {
         var userData = json.decode(response.body);
         setState(() {
@@ -74,7 +74,7 @@ class _ProfilePageState extends State<ProfilePage> {
     String newEmail = _emailController.text;
 
     var response = await http.post(
-      Uri.parse('http://localhost:8000/api/users/update/$id'),
+      Uri.parse('https://rico.terrabyteco.com/api/users/update/$id'),
       body: {
         'name': newName,
         'surname': newSurname,
@@ -115,7 +115,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
       // Realizar la solicitud HTTP para actualizar la imagen del perfil
       var response = await http.post(
-        Uri.parse('http://localhost:8000/api/users/update/$id'),
+        Uri.parse('https://rico.terrabyteco.com/api/users/update/$id'),
         body: {
           'image': base64Image,
         },

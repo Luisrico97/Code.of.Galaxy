@@ -246,7 +246,7 @@ class _PublicationsState extends State<Publications> {
 
   Future<List<Publication>> fetchPublications() async {
     final response =
-        await http.get(Uri.parse('http://localhost:8000/api/publications'));
+        await http.get(Uri.parse('https://rico.terrabyteco.com/api/publications'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body) as List<dynamic>;
       final publications = <Publication>[];
@@ -269,7 +269,7 @@ class _PublicationsState extends State<Publications> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://localhost:8000/api/comments/create'),
+        Uri.parse('https://rico.terrabyteco.com/api/comments/create'),
         body: json.encode({
           'comment': comment,
           'publication_id': publicationId,
@@ -332,7 +332,7 @@ class _PublicationsState extends State<Publications> {
   // Función para cargar los nombres de los frameworks desde la API
   Future<void> fetchFrameworkNames() async {
     final response =
-        await http.get(Uri.parse('http://localhost:8000/api/frameworks'));
+        await http.get(Uri.parse('https://rico.terrabyteco.com/api/frameworks'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body) as List<dynamic>;
       setState(() {
@@ -347,7 +347,7 @@ class _PublicationsState extends State<Publications> {
   // Función para cargar los nombres de los frameworks desde la API
   Future<void> fetchLanguageNames() async {
     final response =
-        await http.get(Uri.parse('http://localhost:8000/api/languages'));
+        await http.get(Uri.parse('https://rico.terrabyteco.com/api/languages'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body) as List<dynamic>;
       setState(() {
@@ -361,7 +361,7 @@ class _PublicationsState extends State<Publications> {
 
   Future<String> fetchUserName(int userId) async {
     final response =
-        await http.get(Uri.parse('http://localhost:8000/api/users/$userId'));
+        await http.get(Uri.parse('https://rico.terrabyteco.com/api/users/$userId'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body) as Map<String, dynamic>;
       final user = User.fromJson(jsonData);
@@ -390,7 +390,7 @@ class _PublicationsState extends State<Publications> {
     try {
       final response = await http.post(
         Uri.parse(
-            'http://localhost:8000/api/publications/create'), // Corrige la URL del endpoint
+            'https://rico.terrabyteco.com/api/publications/create'), // Corrige la URL del endpoint
         body: json.encode({
           'publication': publication,
           'comment':
@@ -441,7 +441,7 @@ class _PublicationsState extends State<Publications> {
 
   Future<List<Comment>> fetchComments(int publicationId) async {
     final response = await http.get(Uri.parse(
-        'http://localhost:8000/api/comments/publication/$publicationId'));
+        'https://rico.terrabyteco.com/api/comments/publication/$publicationId'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body) as List<dynamic>;
       final comments = <Comment>[];

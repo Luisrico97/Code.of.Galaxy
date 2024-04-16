@@ -29,7 +29,7 @@ class _MyPostState extends State<MyPost> {
 
   Future<void> fetchUserPublications(int userId) async {
     final response = await http
-        .get(Uri.parse('http://localhost:8000/api/publications/user/$userId'));
+        .get(Uri.parse('https://rico.terrabyteco.com//api/publications/user/$userId'));
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       setState(() {

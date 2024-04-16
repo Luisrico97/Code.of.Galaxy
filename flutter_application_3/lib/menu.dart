@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:galaxy/Login.dart';
 import 'package:galaxy/profile.dart';
@@ -103,37 +105,6 @@ class _DrawerScreenState extends State<DrawerScreen> {
                       text: 'My Post',
                       icon: Icons.error_outline,
                     ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  NewRow(
-                    text: 'Messages',
-                    icon: Icons.chat_bubble_outline,
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  NewRow(
-                    text: 'Saved',
-                    icon: Icons.bookmark_border,
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  NewRow(
-                    text: 'Favorites',
-                    icon: Icons.favorite_border,
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  NewRow(
-                    text: 'Hint',
-                    icon: Icons.lightbulb_outline,
-                  ),
-                  SizedBox(
-                    height: 20,
                   ),
                 ],
               ),

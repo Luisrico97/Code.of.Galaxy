@@ -23,7 +23,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://localhost:8000/api/users/create'),
+      Uri.parse('https://rico.terrabyteco.com/api/users/create'),
     );
 
     request.fields['name'] = name;

@@ -23,7 +23,7 @@ class _IndividualPublicationPageState extends State<IndividualPublicationPage> {
   }
 
   Future<Publication> fetchPublication(int id) async {
-    final response = await http.get(Uri.parse('http://localhost:8000/api/publications/$id'));
+    final response = await http.get(Uri.parse('https://rico.terrabyteco.com/api/publications/$id'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       return Publication.fromJson(jsonData);
